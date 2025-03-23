@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tensorflow JS Inference</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+</head>
+<body class="w-[100vw] h-[100vh] flex flex-col justify-center items-center">
+    <p class="text-xl font-black">Inference Tensorflow JS Image Classification</p>
+    <div class="max-w-xl flex flex-col justify-center items-center">
+        <br>
+        <input type="file" id="image-upload" accept="image/*" class="border-1 cursor-pointer bg-gray-100">
+        <br>
+        <img id="image-preview" src="#" alt="Image Preview" style="display:none;">
+        <br>
+        <div id="prediction"></div>
+    </div>
+    <script>
+        let model
+        const dict = {0: 'Cloud', 1: 'Other', 2: 'Smoke'}
+
+        async function loadModel(){
+            console.log('Masuk.')
+            model = await tf.loadGraphModel('./tfjs_model/model.json');
+            console.log('Model loaded successfully.')
+            return model
+        }
+        
+        loadModel()
+        
+        function preprocessImage(image){
+            const resizedImage = tf.image.resizeBilinear(image, [128, 128])
+            const mean = resizedImage.mean()
+            const variance = resizedImage.squaredDifference(mean).mean()
+            const stdDev = variance.sqrt()
+            const adjustedStdDev = stdDev.maximum(tf.scalar(1.0 / Math.sqrt(resizedImage.size)))
+            const normalizedImage = resizedImage.sub(mean).div(adjustedStdDev)
+            const batchedImage = normalizedImage.expandDims(0)
+            return batchedImage;
+        }
+
+        async function predict(imageElement) {
+            const imageTensor = tf.browser.fromPixels(imageElement)
+            const preprocessedImage = preprocessImage(imageTensor)
+            const predictions = await model.predict(preprocessedImage)
+            const predictedClass = predictions.argMax(1).dataSync()[0]
+            document.getElementById('prediction').innerText = `Predicted Class: ${dict[predictedClass]}`
+          }
+
+        document.getElementById('image-upload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageElement = document.getElementById('image-preview');
+                    imageElement.src = e.target.result;
+                    imageElement.style.display = 'block';
+                    imageElement.onload = function() {
+                        predict(imageElement);
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+    </script>
+</body>
+</html>

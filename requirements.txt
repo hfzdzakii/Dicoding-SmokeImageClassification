@@ -1,0 +1,9 @@
+pandas==2.2.3
+tensorflow==2.18.0
+tf_keras==2.18.0
+numpy==2.0.2
+datasets==3.3.2
+scikit_learn==1.6.1
+imbalanced_learn==0.13.0
+matplotlib==3.10.0
+tensorflowjs==4.22.0
