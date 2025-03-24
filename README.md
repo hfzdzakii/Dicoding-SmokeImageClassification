@@ -32,6 +32,33 @@ Predict an image between **Smoke**, **Cloud**, or **Other**. Dataset that used i
 3. The result of prediction will appear below input files
 4. The server is using **Memory Storage**. Therefore, no image was permanently stored in server side
 
+## How to Run the Project
+
+### Setup Repository
+
+```
+$ git clone https://github.com/hfzdzakii/Dicoding-SmokeImageClassification.git
+$ cd Dicoding-SmokeImageClassification.git
+```
+
+### Install Node Dependencies and Run Project
+
+```
+$ npm install
+$ node custom_server.js
+```
+
+## Or, You Can Pull The Docker Image
+
+```
+$ docker pull hfzdzakii/smoke-image-classification:latest
+$ docker run --name tfjs-app -p 9000:9000 hfzdzakii/smoke-image-classification:latest
+```
+
+Type `http://localhost:9000` in your browser to open TensorflowJS Inference test app
+
+To stop ExpressJS server, type `Ctrl + C` or `Command + C` in the terminal
+
 ## Understanding Folder 
 
 1. assets : An asset for website front-end
