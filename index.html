@@ -5,9 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tensorflow JS Inference</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 </head>
-<body class="w-[100vw] h-[100vh] flex flex-col justify-center items-center">
+<body class="w-[100vw] min-h-[100vh] my-[1em] flex flex-col justify-center items-center">
     <p class="text-xl font-black">Inference Tensorflow JS Image Classification</p>
     <div class="max-w-xl flex flex-col justify-center items-center">
         <br>
@@ -18,14 +17,18 @@
         <div id="prediction"></div>
     </div>
     <script>
+        /*
         let model
         const dict = {0: 'Cloud', 1: 'Other', 2: 'Smoke'}
 
         async function loadModel(){
-            console.log('Masuk.')
-            model = await tf.loadGraphModel('./tfjs_model/model.json');
-            console.log('Model loaded successfully.')
-            return model
+            try {
+                console.log('Masuk.')
+                model = await tf.loadGraphModel('tfjs_model/model.json')
+                console.log('Model loaded successfully.')
+            } catch (error) {
+                console.log('Error loading model:', error)
+            }
         }
         
         loadModel()
@@ -42,12 +45,17 @@
         }
 
         async function predict(imageElement) {
+            if (!model) {
+                console.log('Model is not loaded yet.')
+                return
+            }
+
             const imageTensor = tf.browser.fromPixels(imageElement)
             const preprocessedImage = preprocessImage(imageTensor)
             const predictions = await model.predict(preprocessedImage)
             const predictedClass = predictions.argMax(1).dataSync()[0]
             document.getElementById('prediction').innerText = `Predicted Class: ${dict[predictedClass]}`
-          }
+        }
 
         document.getElementById('image-upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -64,7 +72,34 @@
                 reader.readAsDataURL(file);
             }
         });
-
+        */
+        document.getElementById('image-upload').addEventListener('change', function (event) {
+            const file = event.target.files[0]
+            if(file){
+                const reader = new FileReader()
+                reader.onload = function (e) {
+                    const imageElement = document.getElementById('image-preview')
+                    imageElement.src = e.target.result
+                    imageElement.style.display = 'block'
+                    const formData = new FormData()
+                    formData.append('image', file)
+                    fetch('/predict', {
+                        method: 'POST',
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Data:', data)
+                        document.getElementById('prediction').innerText = `Predicted Class: ${data.predictedLabel}`
+                    })
+                    .catch(error => {
+                        console.error('Error:', error)
+                        document.getElementById('prediction').innerText = `Error during prediction`
+                    })
+                }
+                reader.readAsDataURL(file)
+            }
+        })
     </script>
 </body>
 </html>
