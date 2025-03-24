@@ -1,0 +1,11 @@
+__pycache__/
+node_modules/
+saved_model/
+saved_model2/
+tflite_model/
+.git
+.gitattributes
+.gitignore
+*.ipynb
+*.py
+*.txt
