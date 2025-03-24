@@ -6,78 +6,31 @@
     <title>Tensorflow JS Inference</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
-<body class="w-[100vw] min-h-[100vh] my-[1em] flex flex-col justify-center items-center">
-    <p class="text-xl font-black">Inference Tensorflow JS Image Classification</p>
-    <div class="max-w-xl flex flex-col justify-center items-center">
-        <br>
-        <input type="file" id="image-upload" accept="image/*" class="border-1 cursor-pointer bg-gray-100">
-        <br>
-        <img id="image-preview" src="#" alt="Image Preview" style="display:none;">
-        <br>
-        <div id="prediction"></div>
+<body class="w-[100vw] min-h-[100vh] overflow-x-hidden flex flex-col justify-center items-center">
+    <div class="flex flex-col justify-center items-center min-h-[95vh]">
+        <p class="text-xl font-black mt-[2em]">Inference Tensorflow JS Image Classification</p>
+        <div class="max-w-xl flex mb-[2em] flex-col justify-center items-center">
+            <br>
+            <input type="file" id="image-upload" accept="image/*" class="border-1 cursor-pointer bg-gray-100">
+            <br>
+            <div id="prediction" class="text-lg"></div>
+            <br>
+            <img id="image-preview" src="#" alt="Image Preview" style="display:none;">
+            <br>
+            <img id="spinner" src="assets/spinner.gif" alt="Loading..." style="display:none; width: 100px; height: 100px;">
+        </div>
+    </div>
+    <div class="w-[100vw] h-[5vh] pl-3 flex items-center">
+        <p class="font-bold">Created by Muhammad Hafizh Dzaki &copy 2025</p>
     </div>
     <script>
-        /*
-        let model
-        const dict = {0: 'Cloud', 1: 'Other', 2: 'Smoke'}
-
-        async function loadModel(){
-            try {
-                console.log('Masuk.')
-                model = await tf.loadGraphModel('tfjs_model/model.json')
-                console.log('Model loaded successfully.')
-            } catch (error) {
-                console.log('Error loading model:', error)
-            }
-        }
-        
-        loadModel()
-        
-        function preprocessImage(image){
-            const resizedImage = tf.image.resizeBilinear(image, [128, 128])
-            const mean = resizedImage.mean()
-            const variance = resizedImage.squaredDifference(mean).mean()
-            const stdDev = variance.sqrt()
-            const adjustedStdDev = stdDev.maximum(tf.scalar(1.0 / Math.sqrt(resizedImage.size)))
-            const normalizedImage = resizedImage.sub(mean).div(adjustedStdDev)
-            const batchedImage = normalizedImage.expandDims(0)
-            return batchedImage;
-        }
-
-        async function predict(imageElement) {
-            if (!model) {
-                console.log('Model is not loaded yet.')
-                return
-            }
-
-            const imageTensor = tf.browser.fromPixels(imageElement)
-            const preprocessedImage = preprocessImage(imageTensor)
-            const predictions = await model.predict(preprocessedImage)
-            const predictedClass = predictions.argMax(1).dataSync()[0]
-            document.getElementById('prediction').innerText = `Predicted Class: ${dict[predictedClass]}`
-        }
-
-        document.getElementById('image-upload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageElement = document.getElementById('image-preview');
-                    imageElement.src = e.target.result;
-                    imageElement.style.display = 'block';
-                    imageElement.onload = function() {
-                        predict(imageElement);
-                    };
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-        */
         document.getElementById('image-upload').addEventListener('change', function (event) {
             const file = event.target.files[0]
             if(file){
                 const reader = new FileReader()
                 reader.onload = function (e) {
+                    const spinner = document.getElementById('spinner')
+                    spinner.style.display = 'block'
                     const imageElement = document.getElementById('image-preview')
                     imageElement.src = e.target.result
                     imageElement.style.display = 'block'
@@ -89,6 +42,7 @@
                     })
                     .then(response => response.json())
                     .then(data => {
+                        spinner.style.display = 'none'
                         console.log('Data:', data)
                         document.getElementById('prediction').innerText = `Predicted Class: ${data.predictedLabel}`
                     })
